@@ -1,0 +1,9 @@
+fastapi==0.109.0
+pymongo
+uvicorn==0.29.0
+click
+assemblyai==0.28.1
+langchain-openai==0.1.14
+openai==1.35.9
+python-multipart==0.0.9
+gTTS==2.5.1
