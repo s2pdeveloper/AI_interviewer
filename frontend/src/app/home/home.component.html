@@ -1,0 +1,58 @@
+<div class="container-fluid parent">
+    <!-- <div class="d-flex flex-column justify-content-center align-items-center intro p-5">
+        
+            <h1>AI Interveiew</h1>
+
+            <p class="content">Moshi is an experimental conversational AI. Take everything it says with a grain of salt. Conversations are limited to 5 min.</p>
+                
+            <p class="content">Moshi thinks and speaks at the same time.Moshi can listen and talk at all time:
+                maximum flow between you and Moshi.</p>
+                
+            <p class="content">Ask it to do some Pirate role play, how to make Lasagna, or what movie it watched last.
+                We strive to support all browsers, Chrome works best.</p>     
+    </div> -->
+    <!-- <div  class="d-flex justify-content-center align-items-center form">
+        <form action="" [formGroup]="reactiveForm"  class="d-flex glass flex-column justify-content-center align-items-center form1" >
+            <label for="email">Please enter you mail id</label>
+            <div>
+            <input type="email" id="email" formControlName="email">
+            <button   class="btn btn-primary" (click)="submit()"><i class="bi bi-arrow-right"></i></button>
+            
+              
+        </div>
+         </form>  
+    </div> -->
+
+    <div class="row justify-content-center align-items-center h-100">
+        <div class="col-4">
+            <div class="card glass-effect ">
+                <div class="card-header fs-4">
+                    <h2 class="text-center fw-bold pt-2" style="text-shadow: 2px 2px 4px grey;">AI Interview</h2>
+                </div>
+                <div class="card-body p-4 fs-5">
+
+                    <p > Welcome to our experimental conversational AI tool. </p><br>
+                    <form action="" [formGroup]="reactiveForm" class="d-flex flex-column">
+                        <label for="email">Please enter your Email</label>
+                        <div class="field">
+                            <span class="fa fa-user ps-3"></span>
+                        <input type="email" id="email" formControlName="email" class=" ps-5"
+                            >
+                        </div>
+
+                        <button class="btn btn-primary mt-5 email__input mb-3" style="width:100%;font-size: 1.2rem;"
+                            (click)="submit()">ENTER</button>
+
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <ngx-spinner bdColor="rgba(51,51,51,0.8)" size="medium" color="#fff" type="ball-scale-multiple">
+        <p style="font-size: 20px; color: white">Loading...</p>
+    </ngx-spinner>
+</div>

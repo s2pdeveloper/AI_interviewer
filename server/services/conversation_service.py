@@ -51,6 +51,7 @@ class ConversationService:
         return success("Conversation Deleted Successfully!")
         
     async def transcribeSpeech(self,file_path):
+        print('file_path---',file_path)
         transcriber = aai.Transcriber()
 
         transcript = transcriber.transcribe(file_path)
@@ -130,7 +131,7 @@ class ConversationService:
         print("userResponse-------",userResponse)
         if not userResponse or userResponse is None:
             interruptPrompt = "Can you please repeat your answer? I was unable to hear you."
-            tts = gTTS(text=AiResponse, lang='en', tld='co.uk')
+            tts = gTTS(text=interruptPrompt, lang='en', tld='co.uk')
             filePath = f"files/{id}.mp3"
             print("filePath-----",filePath)
             tts.save(filePath)
