@@ -7,3 +7,4 @@ langchain-openai==0.1.14
 openai==1.35.9
 python-multipart==0.0.9
 gTTS==2.5.1
+langchain-community==0.2.9

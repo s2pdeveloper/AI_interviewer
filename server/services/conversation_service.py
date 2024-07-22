@@ -13,6 +13,8 @@ from fastapi.responses import FileResponse, JSONResponse
 import assemblyai as aai
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
+
 collection = db["conversation"]
 
 aai.settings.api_key = os.getenv('ASSEMBLYAI_API_KEY')
@@ -20,7 +22,8 @@ os.environ["LANGCHAIN_TRACING_V2"] = "true"
 os.environ["LANGCHAIN_API_KEY"] = os.getenv('LANGCHAIN_API_KEY')
 os.environ["LANGCHAIN_PROJECT"] = "S2PEDUTECH"
 openai.api_key = os.getenv('OPENAI_API_KEY')
-llm = OpenAI()
+# llm = OpenAI(model="gpt-4o-mini-2024-07-18")
+llm = ChatOpenAI(model_name="gpt-4o-mini-2024-07-18", temperature=0.3)
 
 class ConversationService:
     def __init__(self):
@@ -130,7 +133,7 @@ class ConversationService:
         print("userResponse-------",userResponse)
         if not userResponse or userResponse is None:
             interruptPrompt = "Can you please repeat your answer? I was unable to hear you."
-            tts = gTTS(text=AiResponse, lang='en', tld='co.uk')
+            tts = gTTS(text=interruptPrompt, lang='en', tld='co.uk')
             filePath = f"files/{id}.mp3"
             print("filePath-----",filePath)
             tts.save(filePath)
