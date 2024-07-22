@@ -5,6 +5,7 @@ from bson import ObjectId
 from config.mongo import mongo_client
 from pymongo import ReturnDocument
 from models.schemas import ConversationDO,MappingDO
+from config.credentials import ServiceConstant
 from utils.background_exception import handleExceptions
 db = mongo_client.get_database()
 from fastapi import HTTPException, UploadFile,File,BackgroundTasks
@@ -14,16 +15,17 @@ import assemblyai as aai
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import OpenAI
 from langchain_openai import ChatOpenAI
+import boto3
 
 collection = db["conversation"]
 
-aai.settings.api_key = os.getenv('ASSEMBLYAI_API_KEY')
+aai.settings.api_key = ServiceConstant.assemblyai_api_key
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
-os.environ["LANGCHAIN_API_KEY"] = os.getenv('LANGCHAIN_API_KEY')
-os.environ["LANGCHAIN_PROJECT"] = "S2PEDUTECH"
-openai.api_key = os.getenv('OPENAI_API_KEY')
-# llm = OpenAI(model="gpt-4o-mini-2024-07-18")
-llm = ChatOpenAI(model_name="gpt-4o-mini-2024-07-18", temperature=0.3)
+os.environ["LANGCHAIN_API_KEY"] = ServiceConstant.langchain_api_key
+os.environ["LANGCHAIN_PROJECT"] = ServiceConstant.project_name
+openai.api_key = ServiceConstant.openai_api_key
+# llm = OpenAI()
+llm = ChatOpenAI(model_name=ServiceConstant.model, temperature=ServiceConstant.temperature)
 
 class ConversationService:
     def __init__(self):
@@ -51,6 +53,7 @@ class ConversationService:
             raise HTTPException(status_code=400, detail="Please Provide ID")
         collection.delete_one({"_id":ObjectId(id)})
         os.remove(f"files/{id}.mp3")
+        self.deleteFolder(id)
         return success("Conversation Deleted Successfully!")
         
     async def transcribeSpeech(self,file_path):
@@ -122,14 +125,14 @@ class ConversationService:
 
         return updated_document
     
-    async def startConversation(self,backgroundTasks:BackgroundTasks,id:str,file: UploadFile = File(...)):
-        print("id----file----",id,file)
+    async def startConversation(self,backgroundTasks:BackgroundTasks,id:str):
+        print("id----file----",id)
         # return await self.createUpdateConversation(id,"My name is Pooja. I am a software developer. I work in Node Js and Java and in front end I work on angular and ionic.","That's great, Pooja. Why did you choose to become a software developer?")
-        file_location = f"files/{file.filename}"
-        with open(file_location, "wb+") as file_object:
-            file_object.write(file.file.read())
+        # file_location = f"files/{file.filename}"
+        # with open(file_location, "wb+") as file_object:
+        #     file_object.write(file.file.read())
 
-        userResponse = await self.transcribeSpeech(file_location)
+        userResponse = await self.transcribeSpeech(f"{ServiceConstant.s3_bucket_url}{id}/input.wav")
         print("userResponse-------",userResponse)
         if not userResponse or userResponse is None:
             interruptPrompt = "Can you please repeat your answer? I was unable to hear you."
@@ -140,8 +143,8 @@ class ConversationService:
             return FileResponse(path=filePath, media_type='audio/mpeg', filename=f"{id}.mp3")
             
             
-        if userResponse or userResponse is not None:
-            os.remove(file_location)
+        # if userResponse or userResponse is not None:
+        #     os.remove(file_location)
             
         document = collection.find_one({"_id":ObjectId(id)})
         
@@ -177,9 +180,21 @@ class ConversationService:
         filePath = f"files/{id}.mp3"
         print("filePath-----",filePath)
         tts.save(filePath)
+        backgroundTasks.add_task(self.deleteFromS3,f"{id}/input.wav")
         backgroundTasks.add_task(self.createUpdateConversation,id,userResponse,AiResponse)
         return FileResponse(path=filePath, media_type='audio/mpeg', filename=f"{id}.mp3")
     
+    @handleExceptions
+    async def deleteFromS3(self,key):
+        s3 = boto3.client('s3')
+        s3.delete_object(Bucket=ServiceConstant.s3_bucket_name, Key=key)
+    
+    @handleExceptions
+    async def deleteFolder(self,folderName):
+        s3 = boto3.resource('s3')
+        bucket = s3.Bucket(ServiceConstant.s3_bucket_name)
+        bucket.objects.filter(Prefix=folderName).delete()
+        
     async def uploadConversation(self,file: UploadFile = File(...)):
         os.makedirs("files", exist_ok=True)
         file_location = f"files/{file.filename}"

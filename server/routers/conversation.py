@@ -13,9 +13,9 @@ async def createConversation(email:str,uniqueId:str):
 async def deleteConversation(id:str):
     return await conversationService.deleteConversation(id)
 
-@router.put("")
-async def startConversation(backgroundTasks: BackgroundTasks,id:str,file: UploadFile = File(...)):
-    return await conversationService.startConversation(backgroundTasks,id,file)
+@router.put("/{id}")
+async def startConversation(backgroundTasks: BackgroundTasks,id:str):
+    return await conversationService.startConversation(backgroundTasks,id)
 
 @router.post("/upload")
 async def uploadConversation(file: UploadFile = File(...)):
