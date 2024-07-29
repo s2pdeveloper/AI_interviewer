@@ -1,0 +1,48 @@
+<div class="content d-flex flex-column align-items-center justify-content-center" role="main">
+  <div class="fs-3 text-light pb-5 mt-0 pt-0">
+    <p #msg></p>
+  </div>
+  
+    <div class="mic-container card shadow">
+
+      <div class="circle" id="circle" [ngClass]="isLoading?'noAudio':isComputerAudio ? 'Active':'ActiveUser'">
+        <i class="fas fa-microphone"></i>
+      </div>
+
+      <div class="p-3 text-center" style="width:350px">
+        <div class="row pt-2 pb-2 d-flex">
+          <div>
+
+            <!-- <button class="btn btn-primary me-4 px-4" title="Click here to start recording action"
+          (click)="startRecording()" [disabled]="!flag">Start</button>  -->
+            <button class="btn btn-primary px-4 mt-4" [disabled]="!flag" (click)="stopRecording()">Stop</button>
+            
+            <!-- <button class="btn btn-primary mt-4 ms-5" [disabled]="!uploadFlag" (click)="onClick()">Upload</button> -->
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary px-4 mt-4" (click)="viewResult()">End & view Result</button>
+    <!-- <div class="mic-container ms-4 card shadow">
+      <div class="p-3 text-center" style="width:350px">
+        <div class="row pt-2 pb-2 d-flex text-light fs-5">
+          <h3>Your response History</h3>
+            <p>...</p>
+            
+          
+
+        </div>
+      </div>
+    </div> -->
+  
+  <!-- <audio #audioPlayer controls style="margin: 10px;" hidden></audio> -->
+  <!-- <a *ngIf="audioURL" [href]="audioURL" download="recorded_audio.wav" hidden>Download last reecorded Audio</a> -->
+  <!-- <div>
+    <button class="btn btn-primary m-2" [disabled]="!uploadFlag" (click)="onClick()">Upload</button>
+  </div> -->
+
+  <ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="square-jelly-box" [fullScreen]="true">
+    <p style="color: white"> Please wait for AI response </p>
+  </ngx-spinner>
+</div>

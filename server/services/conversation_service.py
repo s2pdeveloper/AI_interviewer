@@ -15,7 +15,8 @@ import assemblyai as aai
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import OpenAI
 from langchain_openai import ChatOpenAI
-import boto3
+import boto3 
+from langchain.schema import StrOutputParser
 
 collection = db["conversation"]
 
@@ -57,6 +58,10 @@ class ConversationService:
         return success("Conversation Deleted Successfully!")
         
     async def transcribeSpeech(self,file_path):
+<<<<<<< HEAD
+=======
+        print('file_path---',file_path)
+>>>>>>> a5a963c (new changes)
         transcriber = aai.Transcriber()
 
         transcript = transcriber.transcribe(file_path)
@@ -132,7 +137,11 @@ class ConversationService:
         # with open(file_location, "wb+") as file_object:
         #     file_object.write(file.file.read())
 
+<<<<<<< HEAD
         userResponse = await self.transcribeSpeech(f"{ServiceConstant.s3_bucket_url}{id}/input.wav")
+=======
+        userResponse = await self.transcribeSpeech(f"{ServiceConstant.s3_bucket_url}{id}/input")
+>>>>>>> a5a963c (new changes)
         print("userResponse-------",userResponse)
         if not userResponse or userResponse is None:
             interruptPrompt = "Can you please repeat your answer? I was unable to hear you."
@@ -174,13 +183,22 @@ class ConversationService:
         prompt = PromptTemplate(input_variables=["history", "input"], template=template)
         formattedPrompt = prompt.format(history=history, input=userResponse)
         print("prompt-----",formattedPrompt)
+<<<<<<< HEAD
         AiResponse = llm.invoke(formattedPrompt)
+=======
+        chain = llm | StrOutputParser()
+        AiResponse = chain.invoke(formattedPrompt)
+>>>>>>> a5a963c (new changes)
         print("AiResponse-----",AiResponse)
         tts = gTTS(text=AiResponse, lang='en', tld='co.uk')
         filePath = f"files/{id}.mp3"
         print("filePath-----",filePath)
         tts.save(filePath)
+<<<<<<< HEAD
         backgroundTasks.add_task(self.deleteFromS3,f"{id}/input.wav")
+=======
+        backgroundTasks.add_task(self.deleteFromS3,f"{id}/input")
+>>>>>>> a5a963c (new changes)
         backgroundTasks.add_task(self.createUpdateConversation,id,userResponse,AiResponse)
         return FileResponse(path=filePath, media_type='audio/mpeg', filename=f"{id}.mp3")
     
