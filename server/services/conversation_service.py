@@ -19,6 +19,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import JsonOutputParser
 from langchain.schema import SystemMessage, HumanMessage
 import boto3
+from langchain.schema import StrOutputParser
 
 session = boto3.Session(
     aws_access_key_id=ServiceConstant.access_key,
@@ -236,7 +237,8 @@ class ConversationService:
         prompt = PromptTemplate(input_variables=["history", "input"], template=template)
         formattedPrompt = prompt.format(history=history, input=userResponse)
         print("prompt-----",formattedPrompt)
-        AiResponse = llm.invoke(formattedPrompt)
+        chain = llm | StrOutputParser()
+        AiResponse = chain.invoke(formattedPrompt)
         print("AiResponse-----",AiResponse)
         tts = gTTS(text=AiResponse, lang='en', tld='co.uk')
         filePath = f"files/{id}.mp3"
