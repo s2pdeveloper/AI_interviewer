@@ -1,0 +1,24 @@
+<div class="parent">
+    <h1 class="text-center pt-5 fw-bold" style="text-shadow:0px 0px 3px #272726;color: rgb(23, 19, 51);">Results</h1>
+    
+    <div *ngFor="let n of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]" class="p-5 fs-4">
+        <div class="box p-4">
+            <p>Que {{n}}. Hello, I will be conducting your interview today. Let's start with the first question: Can you
+                tell me about yourself?</p><br>
+            <div class="d-flex">
+                <div class="ans pe-5">
+                    <p class="fw-bold">Your Answer</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco</p>
+                </div>
+                <div class="ans">
+                    <p class="fw-bold exp">Improvised Answer</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco Ut
+                        enim ad minim veniam, quis nostrud exercitation ullamco </p>
+                </div>
+            </div><br>
+            <p class="fw-bold">Rating: <i *ngFor="let i of [1,2,3]" class="fa-solid fa-star" style="color: #FFD43B;"></i> <i *ngFor="let i of [1,2]" class="fa-solid fa-star"></i></p>
+        </div>
+    </div>
+</div>
