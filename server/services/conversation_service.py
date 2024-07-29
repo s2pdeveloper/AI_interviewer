@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import json
+>>>>>>> d5e1d94 (changes)
 import os
 import openai
 from gtts import gTTS
@@ -10,13 +14,29 @@ from utils.background_exception import handleExceptions
 db = mongo_client.get_database()
 from fastapi import HTTPException, UploadFile,File,BackgroundTasks
 from utils.success import success, result,response
+<<<<<<< HEAD
 from fastapi.responses import FileResponse, JSONResponse
+=======
+from fastapi.responses import FileResponse, JSONResponse, Response
+>>>>>>> d5e1d94 (changes)
 import assemblyai as aai
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import OpenAI
 from langchain_openai import ChatOpenAI
+<<<<<<< HEAD
 import boto3 
 from langchain.schema import StrOutputParser
+=======
+from langchain_core.output_parsers import JsonOutputParser
+from langchain.schema import SystemMessage, HumanMessage
+import boto3
+
+session = boto3.Session(
+    aws_access_key_id=ServiceConstant.access_key,
+    aws_secret_access_key=ServiceConstant.secret_access_key,
+    region_name=ServiceConstant.region
+)
+>>>>>>> d5e1d94 (changes)
 
 collection = db["conversation"]
 
@@ -48,7 +68,42 @@ class ConversationService:
             return response(str(responseData.upserted_id))
         else:
             return response(None)
+<<<<<<< HEAD
         
+=======
+    
+    async def result(self,backgroundTasks: BackgroundTasks,id:str):
+        document = collection.find_one({"_id":ObjectId(id)})
+        conversation = await self.createConversationString(document)
+        print("conversation----",conversation)
+        output ="""[
+                {
+                    "Question":"",
+                    "Human Answer":""
+                    "Improved Answer":""
+                    "Rating":""
+                }
+                ]"""
+        template ="""This is the Interview conversation:
+        {conversation}
+        output:
+        {outputJson}
+        You need to observe the conversation and providing rating out of 5 to  Human each answer  and provide improved answer to Each question in the following json format"""
+        prompt = PromptTemplate(input_variables=["conversation", "outputJson"], template=template)
+        formattedPrompt = prompt.format(conversation=conversation, outputJson=output)
+        print("prompt-----",formattedPrompt)
+        system_prompt = "You are an AI assistant who is expert in taking interview"
+        messages = [
+            SystemMessage(content=system_prompt),
+            HumanMessage(content=formattedPrompt)
+            ]
+        chain = llm | JsonOutputParser()
+        response = chain.invoke(messages)
+        print(response)
+        backgroundTasks.add_task(self.deleteConversation,id)
+        return response
+            
+>>>>>>> d5e1d94 (changes)
     async def deleteConversation(self,id):
         if id is None or not id:
             raise HTTPException(status_code=400, detail="Please Provide ID")
@@ -59,9 +114,15 @@ class ConversationService:
         
     async def transcribeSpeech(self,file_path):
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         print('file_path---',file_path)
 >>>>>>> a5a963c (new changes)
+=======
+        print('file_path---',file_path)
+=======
+>>>>>>> d5e1d94 (changes)
+>>>>>>> 3695529 (changes)
         transcriber = aai.Transcriber()
 
         transcript = transcriber.transcribe(file_path)
@@ -144,12 +205,43 @@ class ConversationService:
 >>>>>>> a5a963c (new changes)
         print("userResponse-------",userResponse)
         if not userResponse or userResponse is None:
+<<<<<<< HEAD
             interruptPrompt = "Can you please repeat your answer? I was unable to hear you."
             tts = gTTS(text=interruptPrompt, lang='en', tld='co.uk')
             filePath = f"files/{id}.mp3"
             print("filePath-----",filePath)
             tts.save(filePath)
             return FileResponse(path=filePath, media_type='audio/mpeg', filename=f"{id}.mp3")
+=======
+            AiResponse = "Can you please repeat your answer? I was unable to hear you."
+            tts = gTTS(text=AiResponse, lang='en', tld='co.uk')
+            filePath = f"files/{id}.mp3"
+            print("filePath-----",filePath)
+            tts.save(filePath)
+            
+            backgroundTasks.add_task(self.deleteFromS3,f"{id}/input")
+            
+            with open(filePath, "rb") as audio_file:
+                audio_content = audio_file.read()
+
+            # Create the multipart response
+            boundary = "custom-boundary"
+            multipart_response = (
+                f"--{boundary}\r\n"
+                f"Content-Disposition: form-data; name=\"response\"\r\n"
+                f"Content-Type: application/json\r\n\r\n"
+                f"{json.dumps({'AiResponse': AiResponse,"next":False})}\r\n"
+                f"--{boundary}\r\n"
+                f"Content-Disposition: form-data; name=\"audio\"; filename=\"{id}.mp3\"\r\n"
+                f"Content-Type: audio/mpeg\r\n\r\n"
+            ).encode() + audio_content + f"\r\n--{boundary}--\r\n".encode()
+
+            return Response(
+                content=multipart_response,
+                media_type=f"multipart/form-data; boundary={boundary}"
+            )
+            # return FileResponse(path=filePath, media_type='audio/mpeg', filename=f"{id}.mp3")
+>>>>>>> d5e1d94 (changes)
             
             
         # if userResponse or userResponse is not None:
@@ -184,11 +276,19 @@ class ConversationService:
         formattedPrompt = prompt.format(history=history, input=userResponse)
         print("prompt-----",formattedPrompt)
 <<<<<<< HEAD
+<<<<<<< HEAD
         AiResponse = llm.invoke(formattedPrompt)
 =======
         chain = llm | StrOutputParser()
         AiResponse = chain.invoke(formattedPrompt)
 >>>>>>> a5a963c (new changes)
+=======
+        chain = llm | StrOutputParser()
+        AiResponse = chain.invoke(formattedPrompt)
+=======
+        AiResponse = llm.invoke(formattedPrompt)
+>>>>>>> d5e1d94 (changes)
+>>>>>>> 3695529 (changes)
         print("AiResponse-----",AiResponse)
         tts = gTTS(text=AiResponse, lang='en', tld='co.uk')
         filePath = f"files/{id}.mp3"
@@ -200,16 +300,48 @@ class ConversationService:
         backgroundTasks.add_task(self.deleteFromS3,f"{id}/input")
 >>>>>>> a5a963c (new changes)
         backgroundTasks.add_task(self.createUpdateConversation,id,userResponse,AiResponse)
+<<<<<<< HEAD
         return FileResponse(path=filePath, media_type='audio/mpeg', filename=f"{id}.mp3")
     
     @handleExceptions
     async def deleteFromS3(self,key):
         s3 = boto3.client('s3')
+=======
+        # return FileResponse(path=filePath, media_type='audio/mpeg', filename=f"{id}.mp3")
+          # Read the audio file content
+        with open(filePath, "rb") as audio_file:
+            audio_content = audio_file.read()
+
+        # Create the multipart response
+        boundary = "custom-boundary"
+        multipart_response = (
+            f"--{boundary}\r\n"
+            f"Content-Disposition: form-data; name=\"response\"\r\n"
+            f"Content-Type: application/json\r\n\r\n"
+            f"{json.dumps({'AiResponse': AiResponse,"next":True})}\r\n"
+            f"--{boundary}\r\n"
+            f"Content-Disposition: form-data; name=\"audio\"; filename=\"{id}.mp3\"\r\n"
+            f"Content-Type: audio/mpeg\r\n\r\n"
+        ).encode() + audio_content + f"\r\n--{boundary}--\r\n".encode()
+
+        return Response(
+            content=multipart_response,
+            media_type=f"multipart/form-data; boundary={boundary}"
+        )
+    
+    @handleExceptions
+    async def deleteFromS3(self,key):
+        s3 = session.client('s3')
+>>>>>>> d5e1d94 (changes)
         s3.delete_object(Bucket=ServiceConstant.s3_bucket_name, Key=key)
     
     @handleExceptions
     async def deleteFolder(self,folderName):
+<<<<<<< HEAD
         s3 = boto3.resource('s3')
+=======
+        s3 = session.resource('s3')
+>>>>>>> d5e1d94 (changes)
         bucket = s3.Bucket(ServiceConstant.s3_bucket_name)
         bucket.objects.filter(Prefix=folderName).delete()
         
