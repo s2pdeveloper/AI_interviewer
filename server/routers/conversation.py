@@ -21,6 +21,10 @@ async def startConversation(backgroundTasks: BackgroundTasks,id:str):
 async def uploadConversation(file: UploadFile = File(...)):
     return await conversationService.uploadConversation(file)
 
+@router.get("/{id}")
+async def result(backgroundTasks: BackgroundTasks,id:str):
+    return await conversationService.result(backgroundTasks,id)
+
 
 
 

@@ -9,3 +9,6 @@ class ServiceConstant:
     assemblyai_api_key = os.getenv("ASSEMBLYAI_API_KEY")
     langchain_api_key=os.getenv("LANGCHAIN_API_KEY")
     project_name="S2PEDUTECH"
+    access_key=os.getenv("ACCESS_KEY")
+    secret_access_key=os.getenv("SECRET_ACCESS_KEY")
+    region=os.getenv("REGION")

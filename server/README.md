@@ -6,4 +6,5 @@ steps:
    venv\Scripts\Activate.ps1 - windows in powershell
 4. cd server
 5. pip install -r requirements.txt
-6. uvicorn app:app --reload --port 9000
+6.  uvicorn app:app --reload --port 9000
+
