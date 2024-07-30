@@ -1,4 +1,5 @@
 .parent {
+    min-height: 100vh;
     height: auto;
     width: auto;
     background: rgb(174, 238, 224);

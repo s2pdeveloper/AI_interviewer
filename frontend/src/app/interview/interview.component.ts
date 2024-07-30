@@ -32,6 +32,7 @@ export class InterviewComponent implements OnInit {
   data: any;
   isComputerAudio: boolean = true;
   isLoading: boolean = false;
+  
   ngOnInit() {
 
     this.id = localStorage.getItem("id")
@@ -244,9 +245,7 @@ export class InterviewComponent implements OnInit {
 
   // }
   viewResult() {
-    this.service.getConvo('66a77a3617212a0a5de9eafb').subscribe((data)=>{
-      console.log(data);
-    });
+    
     this.route.navigateByUrl('/result');
   }
   showText(message: string, index: number, interval: number) {

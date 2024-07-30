@@ -134,9 +134,9 @@ class ConversationService:
         print("last_index-----",last_index)
         print("document['ai']---",document["mapping"][last_index]['ai'])
         update_query = {"_id": ObjectId(id)}
-        update_data = MappingDO(human=userResponse,ai= document["mapping"][last_index]['ai'])
+        # update_data = MappingDO(human=userResponse,ai= document["mapping"][last_index]['ai'])
         new_data = MappingDO(ai=aiResponse)
-        print("update_data-----",update_data)
+        # print("update_data-----",update_data)
         # update_data = {f"mapping.{last_index}.human": userResponse}
         print("new_data-----",new_data)
         
@@ -145,11 +145,16 @@ class ConversationService:
         #     {"$set": {"mapping.-1": update_data.dict()}},
         #     return_document=ReturnDocument.AFTER
         # )
+        # updated_document = collection.find_one_and_update(
+        # update_query,
+        # {"$set": {"mapping.$[lastElem]": update_data.dict()}},
+        # array_filters=[{"lastElem": {"$exists": True}}],
+        # return_document=ReturnDocument.AFTER
+        # )
         updated_document = collection.find_one_and_update(
-        update_query,
-        {"$set": {"mapping.$[lastElem]": update_data.dict()}},
-        array_filters=[{"lastElem": {"$exists": True}}],
-        return_document=ReturnDocument.AFTER
+            update_query,
+            {"$set": {f"mapping.{last_index}.human": userResponse}},
+            return_document=ReturnDocument.AFTER
         )
         print("updated_document-----first",updated_document)
         
