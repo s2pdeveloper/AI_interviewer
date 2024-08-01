@@ -8,7 +8,7 @@ import * as S3 from 'aws-sdk/clients/s3';
 export class AwsService {
 
     bucket = new S3({
-    
+      
     region: 'ap-south-1'
   });
   

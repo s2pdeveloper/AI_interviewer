@@ -10,6 +10,7 @@ export class ConversationService {
 
     routes={
         startConversationPath:(id:any)=>`${environment.baseUrl}/conversation/${id}`,
+        getConversationPath:(id:any)=>`${environment.baseUrl}/conversation/${id}`,
         createConversationPath:(payload:any)=>`${environment.baseUrl}/conversation?email=${payload.email}&uniqueId=${payload.uniqueId}`,
     }
 
@@ -26,6 +27,10 @@ export class ConversationService {
     return this.http.put(this.routes.startConversationPath(id),'',{responseType:'arraybuffer'}
       )
   }
+  getConvo(id:any){
+    return this.http.get(this.routes.getConversationPath(id));
+  }
+
   getAudioFile(id: any): Observable<string | ArrayBuffer | null> {
     const url = `${environment.baseUrl}/${id}`; // Adjust URL based on your backend API
 

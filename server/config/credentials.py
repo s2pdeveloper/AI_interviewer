@@ -8,11 +8,7 @@ class ServiceConstant:
     s3_bucket_url = os.getenv("S3_BUCKET_URL")
     assemblyai_api_key = os.getenv("ASSEMBLYAI_API_KEY")
     langchain_api_key=os.getenv("LANGCHAIN_API_KEY")
-<<<<<<< HEAD
-    project_name="S2PEDUTECH"
-=======
     project_name="S2PEDUTECH"
     access_key=os.getenv("ACCESS_KEY")
     secret_access_key=os.getenv("SECRET_ACCESS_KEY")
     region=os.getenv("REGION")
->>>>>>> d5e1d94 (changes)

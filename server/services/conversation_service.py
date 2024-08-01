@@ -86,7 +86,7 @@ class ConversationService:
         chain = llm | JsonOutputParser()
         response = chain.invoke(messages)
         print(response)
-        backgroundTasks.add_task(self.deleteConversation,id)
+        # backgroundTasks.add_task(self.deleteConversation,id)
         return response
             
     async def deleteConversation(self,id):
@@ -109,12 +109,16 @@ class ConversationService:
         
     async def createConversationString(self,document):
         conversation_string = ""
+        print("document['mapping']---",document['mapping'])
         for entry in document['mapping']:
+            print(entry)
             ai_part = f"AI Assistant: {entry['ai']}\n"
             human_part = f"Human: {entry['human']}\n"
             conversation_string += ai_part
+            print( entry['human'] is not None)
             if  entry['human'] is not None:
                 conversation_string += human_part
+            print("conversation_string----",conversation_string)
                 
         return conversation_string
     
@@ -130,9 +134,9 @@ class ConversationService:
         print("last_index-----",last_index)
         print("document['ai']---",document["mapping"][last_index]['ai'])
         update_query = {"_id": ObjectId(id)}
-        update_data = MappingDO(human=userResponse,ai= document["mapping"][last_index]['ai'])
+        # update_data = MappingDO(human=userResponse,ai= document["mapping"][last_index]['ai'])
         new_data = MappingDO(ai=aiResponse)
-        print("update_data-----",update_data)
+        # print("update_data-----",update_data)
         # update_data = {f"mapping.{last_index}.human": userResponse}
         print("new_data-----",new_data)
         
@@ -141,11 +145,16 @@ class ConversationService:
         #     {"$set": {"mapping.-1": update_data.dict()}},
         #     return_document=ReturnDocument.AFTER
         # )
+        # updated_document = collection.find_one_and_update(
+        # update_query,
+        # {"$set": {"mapping.$[lastElem]": update_data.dict()}},
+        # array_filters=[{"lastElem": {"$exists": True}}],
+        # return_document=ReturnDocument.AFTER
+        # )
         updated_document = collection.find_one_and_update(
-        update_query,
-        {"$set": {"mapping.$[lastElem]": update_data.dict()}},
-        array_filters=[{"lastElem": {"$exists": True}}],
-        return_document=ReturnDocument.AFTER
+            update_query,
+            {"$set": {f"mapping.{last_index}.human": userResponse}},
+            return_document=ReturnDocument.AFTER
         )
         print("updated_document-----first",updated_document)
         
@@ -193,7 +202,7 @@ class ConversationService:
                 f"--{boundary}\r\n"
                 f"Content-Disposition: form-data; name=\"response\"\r\n"
                 f"Content-Type: application/json\r\n\r\n"
-                f"{json.dumps({'AiResponse': AiResponse,"next":False})}\r\n"
+                f"{json.dumps({'AiResponse': AiResponse,'next':False})}\r\n"
                 f"--{boundary}\r\n"
                 f"Content-Disposition: form-data; name=\"audio\"; filename=\"{id}.mp3\"\r\n"
                 f"Content-Type: audio/mpeg\r\n\r\n"
@@ -257,7 +266,7 @@ class ConversationService:
             f"--{boundary}\r\n"
             f"Content-Disposition: form-data; name=\"response\"\r\n"
             f"Content-Type: application/json\r\n\r\n"
-            f"{json.dumps({'AiResponse': AiResponse,"next":True})}\r\n"
+            f"{json.dumps({'AiResponse': AiResponse,'next':True})}\r\n"
             f"--{boundary}\r\n"
             f"Content-Disposition: form-data; name=\"audio\"; filename=\"{id}.mp3\"\r\n"
             f"Content-Type: audio/mpeg\r\n\r\n"
