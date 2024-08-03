@@ -86,7 +86,7 @@ export class InterviewComponent implements OnInit {
     // this.onClick();
 
   }
-
+  audio = new Audio();
   async onClick() {
     if (this.audioURL) {
       this.isLoading = true;
@@ -164,6 +164,7 @@ export class InterviewComponent implements OnInit {
       //     console.error('Error processing response:', error);
       //   }
       // });
+      
       this.service.startCono(this.id).subscribe((response: ArrayBuffer) => {
         try {
           const boundary = '--custom-boundary';
@@ -192,13 +193,13 @@ export class InterviewComponent implements OnInit {
       
           // Play audio if available
           const url = window.URL.createObjectURL(audioBlob);
-          const audio = new Audio();
-          audio.src = url;
+         
+          this.audio.src = url;
           this.spinner.hide();
-          audio.play();
+          this.audio.play();
           this.msgElement.nativeElement.textContent = '';
     this.showText(this.aiResponseText, 0, 80);
-    audio.onended = () => {
+    this.audio.onended = () => {
       this.flag = true;
       console.log('ended')
       this.isComputerAudio = false;
@@ -245,8 +246,11 @@ export class InterviewComponent implements OnInit {
 
   // }
   viewResult() {
-    
+    if (this.audio && !this.audio.paused) {
+      this.audio.pause();
+    }
     this.route.navigateByUrl('/result');
+
   }
   showText(message: string, index: number, interval: number) {
 

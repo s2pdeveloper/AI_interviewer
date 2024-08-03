@@ -114,10 +114,10 @@ class ConversationService:
             print(entry)
             ai_part = f"AI Assistant: {entry['ai']}\n"
             human_part = f"Human: {entry['human']}\n"
-            conversation_string += ai_part
+            # conversation_string += ai_part
             print( entry['human'] is not None)
             if  entry['human'] is not None:
-                conversation_string += human_part
+                conversation_string +=ai_part+"\n"+ human_part
             print("conversation_string----",conversation_string)
                 
         return conversation_string
