@@ -45,6 +45,13 @@ class ConversationService:
         if email is None or not email:
             raise HTTPException(status_code=400, detail="Please Provide Email")
         
+        sess = boto3.Session(aws_access_key_id=ServiceConstant.access_key,
+                       aws_secret_access_key=ServiceConstant.secret_access_key)
+        sts_connection = sess.client('sts')
+        assume_role_object = sts_connection.assume_role(
+            RoleArn=ServiceConstant.assume_role_arn, RoleSessionName=ServiceConstant.assume_role_name,
+            DurationSeconds=43200)
+        credentials = assume_role_object['Credentials']
         mappingDO = MappingDO(ai="Hello, I will be conducting your interview today. Let's start with the first question: Can you tell me about yourself?")
         conversationDO = ConversationDO(email=email,uniqueId=uniqueId,mapping=[mappingDO])
         responseData = collection.update_one(
@@ -53,10 +60,22 @@ class ConversationService:
                 upsert=True
                 )
         print("responseData---",responseData)
+        # print(credentials)
+        data ={
+                "accessKey":credentials['AccessKeyId'],
+                "secretKey":credentials['SecretAccessKey'],
+                "sessionToken":credentials['SessionToken'],
+                
+            }
         if responseData.upserted_id is not None:
-            return response(str(responseData.upserted_id))
+            data["id"] = str(responseData.upserted_id)
+            return result(data)
         else:
-            return response(None)
+            data["id"] = None
+            return result(data)
+       
+   
+        
     
     async def result(self,backgroundTasks: BackgroundTasks,id:str):
         document = collection.find_one({"_id":ObjectId(id)})
