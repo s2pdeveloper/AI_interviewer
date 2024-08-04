@@ -6,8 +6,11 @@ import * as S3 from 'aws-sdk/clients/s3';
   providedIn: 'root'
 })
 export class AwsService {
-
+  accessKey:any=localStorage.getItem("accessKey");
+  secretKey:any=localStorage.getItem("secretKey");
     bucket = new S3({
+      accessKeyId:this.accessKey,
+      secretAccessKey:this.secretKey,
     region: 'ap-south-1'
   });
   

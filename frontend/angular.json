@@ -31,7 +31,7 @@
               "node_modules/ngx-toastr/toastr.css",
               "node_modules/ngx-spinner/animations/square-jelly-box.css",
               "node_modules/ngx-spinner/animations/ball-scale-multiple.css",
-              "D:/S2/Ali_interview/frontend/node_modules/ngx-spinner/animations/fire.css"
+              "node_modules/ngx-spinner/animations/fire.css"
               
             ],
             "scripts": []

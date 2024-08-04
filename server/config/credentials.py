@@ -12,3 +12,5 @@ class ServiceConstant:
     access_key=os.getenv("ACCESS_KEY")
     secret_access_key=os.getenv("SECRET_ACCESS_KEY")
     region=os.getenv("REGION")
+    assume_role_arn=os.getenv("ASSUME_ROLE_ARN")
+    assume_role_name=os.getenv("ASSUME_ROLE_NAME")

@@ -48,8 +48,13 @@ export class HomeComponent implements OnInit {
     this.service.createConvo(payload).subscribe((res) => {
 
       console.log(res);
-
-      localStorage.setItem('id', res.toString())
+      //const obj=res;
+      const result = (res as { result: { accessKey: string,id:string,secretKey:string } }).result;
+      //const accessKey = obj.result.accessKey;
+      localStorage.setItem('id',result.id);
+      localStorage.setItem('accessKey', result.accessKey)
+      localStorage.setItem('secretKey', result.secretKey)
+      //console.log('---->',result.id,result.accessKey,result.secretKey)
       //this.loaded=true;
       this.spinner.hide();
       this.route.navigate(['/audio'])
