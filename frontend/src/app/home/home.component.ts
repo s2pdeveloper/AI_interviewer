@@ -49,11 +49,12 @@ export class HomeComponent implements OnInit {
 
       console.log(res);
       //const obj=res;
-      const result = (res as { result: { accessKey: string,id:string,secretKey:string } }).result;
+      const result = (res as { result: { accessKey: string,id:string,secretKey:string ,sessionToken:string} }).result;
       //const accessKey = obj.result.accessKey;
       localStorage.setItem('id',result.id);
       localStorage.setItem('accessKey', result.accessKey)
       localStorage.setItem('secretKey', result.secretKey)
+      localStorage.setItem('sessionToken', result.sessionToken)
       //console.log('---->',result.id,result.accessKey,result.secretKey)
       //this.loaded=true;
       this.spinner.hide();

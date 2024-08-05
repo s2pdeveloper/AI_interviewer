@@ -52,6 +52,7 @@ class ConversationService:
             RoleArn=ServiceConstant.assume_role_arn, RoleSessionName=ServiceConstant.assume_role_name,
             DurationSeconds=43200)
         credentials = assume_role_object['Credentials']
+        print("credentials----",credentials)
         mappingDO = MappingDO(ai="Hello, I will be conducting your interview today. Let's start with the first question: Can you tell me about yourself?")
         conversationDO = ConversationDO(email=email,uniqueId=uniqueId,mapping=[mappingDO])
         responseData = collection.update_one(
@@ -81,32 +82,37 @@ class ConversationService:
         document = collection.find_one({"_id":ObjectId(id)})
         conversation = await self.createConversationString(document)
         print("conversation----",conversation)
-        output ="""[
-                {
-                    "Question":"",
-                    "Human Answer":""
-                    "Improved Answer":""
-                    "Rating":""
-                }
-                ]"""
-        template ="""This is the Interview conversation:
-        {conversation}
-        output:
-        {outputJson}
-        You need to observe the conversation and providing rating out of 5 to  Human each answer  and provide improved answer to Each question in the following json format"""
-        prompt = PromptTemplate(input_variables=["conversation", "outputJson"], template=template)
-        formattedPrompt = prompt.format(conversation=conversation, outputJson=output)
-        print("prompt-----",formattedPrompt)
-        system_prompt = "You are an AI assistant who is expert in taking interview"
-        messages = [
-            SystemMessage(content=system_prompt),
-            HumanMessage(content=formattedPrompt)
-            ]
-        chain = llm | JsonOutputParser()
-        response = chain.invoke(messages)
-        print(response)
-        # backgroundTasks.add_task(self.deleteConversation,id)
-        return response
+        if conversation:
+            output ="""[
+                    {
+                        "Question":"",
+                        "Human Answer":""
+                        "Improved Answer":""
+                        "Rating":""
+                    }
+                    ]"""
+            template ="""This is the Interview conversation:
+            {conversation}
+            output:
+            {outputJson}
+            You need to observe the conversation and providing rating out of 5 to  Human each answer  and provide improved answer to Each question in the following json format"""
+            prompt = PromptTemplate(input_variables=["conversation", "outputJson"], template=template)
+            formattedPrompt = prompt.format(conversation=conversation, outputJson=output)
+            print("prompt-----",formattedPrompt)
+            system_prompt = "You are an AI assistant who is expert in taking interview"
+            messages = [
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=formattedPrompt)
+                ]
+            chain = llm | JsonOutputParser()
+            response = chain.invoke(messages)
+            print(response)
+            backgroundTasks.add_task(self.deleteConversation,id)
+            return response
+        else:
+            return []
+            
+     
             
     async def deleteConversation(self,id):
         if id is None or not id:
