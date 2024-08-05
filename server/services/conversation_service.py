@@ -50,7 +50,7 @@ class ConversationService:
         sts_connection = sess.client('sts')
         assume_role_object = sts_connection.assume_role(
             RoleArn=ServiceConstant.assume_role_arn, RoleSessionName=ServiceConstant.assume_role_name,
-            DurationSeconds=43200)
+            DurationSeconds=3600)
         credentials = assume_role_object['Credentials']
         mappingDO = MappingDO(ai="Hello, I will be conducting your interview today. Let's start with the first question: Can you tell me about yourself?")
         conversationDO = ConversationDO(email=email,uniqueId=uniqueId,mapping=[mappingDO])
