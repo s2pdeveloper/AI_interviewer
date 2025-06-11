@@ -80,7 +80,7 @@ class ConversationService:
     
     async def result(self,backgroundTasks: BackgroundTasks,id:str):
         document = collection.find_one({"_id":ObjectId(id)})
-        conversation = await self.createConversationString(document)
+        conversation = await self.createConversationString(document,True)
         print("conversation----",conversation)
         if conversation:
             output ="""[
@@ -132,17 +132,21 @@ class ConversationService:
             print(transcript.text)
             return transcript.text   
         
-    async def createConversationString(self,document):
+    async def createConversationString(self,document,result):
         conversation_string = ""
         print("document['mapping']---",document['mapping'])
         for entry in document['mapping']:
             print(entry)
             ai_part = f"AI Assistant: {entry['ai']}\n"
             human_part = f"Human: {entry['human']}\n"
-            # conversation_string += ai_part
+            if not result:
+                conversation_string += ai_part 
             print( entry['human'] is not None)
             if  entry['human'] is not None:
-                conversation_string +=ai_part+"\n"+ human_part
+                if not result:
+                     conversation_string += human_part
+                else:
+                    conversation_string += ai_part + human_part
             print("conversation_string----",conversation_string)
                 
         return conversation_string
@@ -245,7 +249,7 @@ class ConversationService:
             
         document = collection.find_one({"_id":ObjectId(id)})
         
-        history = await self.createConversationString(document)
+        history = await self.createConversationString(document,False)
        
         print("history-----",history)
         template = """You are a professional, knowledgeable, and friendly chatbot with 10 years of experience as an HR specialist. You are designed to conduct HR interviews for software developer positions. Your primary goal is to evaluate the candidate's professional background, assess their skills, and determine how well they fit with our company culture. 

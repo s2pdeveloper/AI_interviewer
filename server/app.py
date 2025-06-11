@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import conversation
+from routers import conversation,hf
 from utils.global_exception import CustomExceptionHandler
 app = FastAPI(swagger_ui_parameters={"displayRequestDuration": True})
 app.add_middleware(
@@ -19,6 +19,10 @@ async def read_root():
 app.include_router(conversation.router,
     prefix="/conversation",
     tags=["Conversation"])
+
+app.include_router(hf.router,
+    prefix="/hf",
+    tags=["Hf"])
 
 
 
