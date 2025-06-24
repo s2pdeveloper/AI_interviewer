@@ -1,4 +1,4 @@
-from fastapi import APIRouter,UploadFile,File,BackgroundTasks
+from fastapi import APIRouter, Request,UploadFile,File,BackgroundTasks
 from services.conversation_service import ConversationService
 
 router = APIRouter()
@@ -14,8 +14,8 @@ async def deleteConversation(id:str):
     return await conversationService.deleteConversation(id)
 
 @router.put("/{id}")
-async def startConversation(backgroundTasks: BackgroundTasks,id:str):
-    return await conversationService.startConversation(backgroundTasks,id)
+async def startConversation(backgroundTasks: BackgroundTasks,id:str,request:Request):
+    return await conversationService.startConversation(backgroundTasks,id,request)
 
 @router.post("/upload")
 async def uploadConversation(file: UploadFile = File(...)):

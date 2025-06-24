@@ -1,4 +1,6 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 class ServiceConstant:
     model = "gpt-4o-mini-2024-07-18"
