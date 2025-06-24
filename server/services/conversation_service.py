@@ -132,7 +132,7 @@ class ConversationService:
             print(transcript.text)
             return transcript.text   
         
-    async def createConversationString(self,document,result):
+    async def  createConversationString(self,document,result):
         conversation_string = ""
         print("document['mapping']---",document['mapping'])
         for entry in document['mapping']:

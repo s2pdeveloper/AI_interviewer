@@ -1,15 +1,33 @@
+from xml.dom.minidom import Document
 import requests
 import time
 from fastapi import HTTPException, Request, UploadFile,File,BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse, Response
+from routers.conversation import result
+from services.conversation_service import ConversationService
+from langchain_core.prompts import PromptTemplate
+from langchain.schema import StrOutputParser
+from langchain_community.llms import HuggingFaceEndpoint
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+token = os.getenv("HF_TOKEN")
 
 # Hugging Face token and endpoint 
 hf_token = ""   
 model_url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
 
+# llm = HuggingFaceEndpoint(
+#     endpoint_url="https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1",
+#     huggingfacehub_api_token=token,
+#     model_kwargs={"temperature": 0.7, "max_new_tokens": 512}
+# )
+
 # Headers
 headers = {
-    "Authorization": f"Bearer {hf_token}",
+    "Authorization": f"Bearer {token}",
     "Content-Type": "application/json"
 }
  
@@ -26,6 +44,21 @@ class HFService:
             prompt += f"{role}: {msg['content']}\n"
         prompt += "Assistant:"
         return prompt
+    
+    async def createConversationString(self, mapping, result):
+        conversation_string = ""
+        for entry in mapping:
+            ai_part = f"AI Assistant: {entry['ai']}\n"
+            human_part = f"Human: {entry['human']}\n"
+            if not result:
+                conversation_string += ai_part 
+            if entry['human'] is not None:
+                if not result:
+                    conversation_string += human_part
+                else:
+                    conversation_string += ai_part + human_part
+        return conversation_string
+
 
     async def getOutputFromHF(self, email, uniqueId):
         user_input = input("👤 You: ")
@@ -69,50 +102,46 @@ class HFService:
 
     # This is your POST API to start conversation
 
-    async def startConversation(self, backgroundTasks: BackgroundTasks,  request: Request):
-        # print("Received request for ID:", id)
-
-        # Step 1: Extract user input from request body
+    async def startConversation(self, backgroundTasks: BackgroundTasks, request: Request):
         body = await request.json()
         userResponse = body.get("userResponse", "").strip()
         print("User said:", userResponse)
 
-        # Step 2: Handle empty input
         if not userResponse:
             return JSONResponse(
                 content={"AiResponse": "Can you please repeat your answer? I was unable to hear you.", "next": False}
             )
 
-        # Step 3: Get existing conversation from MongoDB
-        # document = collection.find_one({"_id": ObjectId(id)})
-        # if not document:
-        #     return JSONResponse(
-        #         content={"AiResponse": "Conversation not found.", "next": False},
-        #         status_code=404
-        #     )
+        # Optional: Simulate chat history (in-memory)
+        mock_history = [
+            {"ai": "Hello, welcome to the interview!", "human": "Hi, thank you!"},
+            {"ai": "Can you tell me about yourself?", "human": "I'm a developer working in Node.js and Angular."}
+        ]
 
-        # Step 4: Create conversation history string
-        history = await ConversationService().createConversationString(document, isHr=True)
-        print("Conversation History:\n", history)
+        history = await self.createConversationString(mock_history, result=False)
 
-        # Step 5: Prepare AI prompt
-        template = """You are a professional, knowledgeable, and friendly chatbot with 10 years of experience as an HR specialist. You are designed to conduct HR interviews for software developer positions. Your primary goal is to evaluate the candidate's professional background, assess their skills, and determine how well they fit with our company culture.
+        template = """You are a professional, knowledgeable, and friendly chatbot with 10 years of experience as an HR specialist. 
+        You are designed to conduct HR interviews for software developer positions. Your primary goal is to evaluate the candidate's professional background, assess their skills, and determine how well they fit with our company culture.
 
-    Start the interview with an introduction, then proceed by asking relevant HR questions based on the candidate's responses. Keep the conversation focused, engaging, and structured.
+        Start the interview with an introduction, then proceed by asking relevant HR questions based on the candidate's responses. Keep the conversation focused, engaging, and structured.
 
-    Current conversation:
-    {history}
-    Human: {input}
-    AI Assistant:"""
+        Current conversation:
+        {history}
+        Human: {input}
+        AI Assistant:"""
 
         prompt = PromptTemplate(input_variables=["history", "input"], template=template)
         formattedPrompt = prompt.format(history=history, input=userResponse)
+
         print("Prompt sent to AI:\n", formattedPrompt)
 
-        # Step 6: Get response from Mistral AI
         try:
-            chain = llm | StrOutputParser()
-            AiResponse = chain.invoke(formattedPrompt)
+            # chain = model_url | StrOutputParser()
+            # AiResponse = chain.invoke(formattedPrompt)
+            response = requests.post(model_url, headers=headers, json=formattedPrompt)
+            response.raise_for_status()
+            print("AI response received successfully.",response.json())
+            return response.json()
         except Exception as e:
             print("AI error:", str(e))
             return JSONResponse(
@@ -122,17 +151,10 @@ class HFService:
 
         print("AI Responded:", AiResponse)
 
-        # Step 7: Save update in background (user + AI response)
-        backgroundTasks.add_task(
-            ConversationService().createUpdateConversation,
-            id,
-            userResponse,
-            AiResponse
-        )
+         
 
-        # Step 8: Return response to frontend
         return JSONResponse(content={"AiResponse": AiResponse, "next": True})
 
 
 
- 
+    
