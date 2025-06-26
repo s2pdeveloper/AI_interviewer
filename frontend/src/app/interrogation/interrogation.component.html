@@ -12,7 +12,7 @@
     </div>
   </div> -->
 
-  <div class="content d-flex flex-column align-items-center justify-content-center" role="main">
+  <!-- <div class="content d-flex flex-column align-items-center justify-content-center" role="main">
     <div class="fs-3 text-light pb-5 mt-0 pt-0">
       <p #msg></p>
     </div>
@@ -41,7 +41,7 @@
     <ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="square-jelly-box" [fullScreen]="true">
       <p style="color: white"> Please wait for AI response </p>
     </ngx-spinner>
-  </div>
+  </div> -->
   
   <!-- <div class="chat-container">
     <p><strong>Bot:</strong> How can I help you?</p>
@@ -64,5 +64,49 @@
     <button (click)="startConversation()" > Start </button>
   </div> -->
   
+
+
+  <div class="content d-flex flex-column align-items-center justify-content-center" role="main">
+  <div class="fs-3 text-light pb-5 mt-0 pt-0">
+    <p #msg></p>
+  </div>
+
+  <div class="mic-container card shadow">
+    <div class="circle" id="circle" [ngClass]="{ 'Speaking': isSpeaking }">
+      <i class="fas fa-microphone"></i>
+    </div>
+
+    <div class="d-flex">
+      <div class="stop" (click)="startConversation()">
+        <i class="fas fa-play"></i>
+      </div>
+      <div class="stop" (click)="forceStop()">
+        <i class="fas fa-stop"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Listening Status -->
+  <div class="text-light pt-3 fs-5">
+    <p *ngIf="!isListening && !isSpeaking">
+      Say <strong>"Hi Chintu"</strong> to begin your conversation...
+    </p>
+    <p *ngIf="isListening && !isSpeaking">🎙️ Listening...</p>
+    <p *ngIf="interimTranscript"><strong>You:</strong> {{ interimTranscript }}</p>
+    <p *ngIf="userText"><strong>You (final):</strong> {{ userText }}</p>
+    <p *ngIf="botResponse"><strong>Bot:</strong> {{ botResponse }}</p>
+  </div>
+
+  <ngx-spinner
+    bdColor="rgba(0, 0, 0, 0.8)"
+    size="medium"
+    color="#fff"
+    type="square-jelly-box"
+    [fullScreen]="true"
+  >
+    <p style="color: white"> Please wait for AI response </p>
+  </ngx-spinner>
+</div>
+
 
   
