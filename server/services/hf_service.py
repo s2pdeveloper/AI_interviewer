@@ -8,6 +8,7 @@ from services.conversation_service import ConversationService
 from langchain_core.prompts import PromptTemplate
 from langchain.schema import StrOutputParser
 from langchain_community.llms import HuggingFaceEndpoint
+# from transformers import pipeline
 
 import os
 from dotenv import load_dotenv
@@ -16,8 +17,11 @@ load_dotenv()
 token = os.getenv("HF_TOKEN")
 
 # Hugging Face token and endpoint 
-hf_token = ""   
-model_url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+hf_token = "OdLb43dQq8nJVXXODgcwTn2B4iT8C91G"   
+# model_url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+model_url ="https://api-inference.huggingface.co/models/mistralai/mistral-small-latest"
+
+
 
 # llm = HuggingFaceEndpoint(
 #     endpoint_url="https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1",
@@ -27,7 +31,7 @@ model_url = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-In
 
 # Headers
 headers = {
-    "Authorization": f"Bearer {token}",
+    "Authorization": f"Bearer {hf_token}",
     "Content-Type": "application/json"
 }
  
@@ -104,6 +108,7 @@ class HFService:
 
     async def startConversation(self, backgroundTasks: BackgroundTasks, request: Request):
         body = await request.json()
+        print("User body:", body)
         userResponse = body.get("userResponse", "").strip()
         print("User said:", userResponse)
 
@@ -135,10 +140,14 @@ class HFService:
 
         print("Prompt sent to AI:\n", formattedPrompt)
 
+   
+
         try:
             # chain = model_url | StrOutputParser()
             # AiResponse = chain.invoke(formattedPrompt)
             response = requests.post(model_url, headers=headers, json=formattedPrompt)
+            print("Response from AI:", response.status_code)
+            print("Response from AI:", response.text)
             response.raise_for_status()
             print("AI response received successfully.",response.json())
             return response.json()

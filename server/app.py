@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import conversation,hf
 from utils.global_exception import CustomExceptionHandler
+
+
 app = FastAPI(swagger_ui_parameters={"displayRequestDuration": True})
 app.add_middleware(
     CORSMiddleware,
@@ -13,6 +15,7 @@ app.add_middleware(
 app.add_middleware(CustomExceptionHandler)
 @app.get("/healthCheck")
 async def read_root():
+    print("server is running")
     return {"message": "Server is Running"}
 
 
